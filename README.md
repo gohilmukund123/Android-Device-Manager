@@ -1,23 +1,23 @@
-# Android Device Manager
+## Android Device Manager
 
-Android Device Manager is a web application designed to simplify the management of Android devices and emulators for security researchers and developers. This tool provides a comprehensive solution for checking and finding weaknesses in Android apps, the Android system, and the Android (Linux) core. It utilizes the Android Debug Bridge (adb) for device management and offers various features to enhance efficiency and effectiveness in Android security research.
+This project offers a web application, Android Device Manager, designed to simplify Android device and emulator management for security researchers and developers. It streamlines the process of identifying vulnerabilities within Android apps, the Android system itself, and the underlying Android (Linux) core. The tool leverages the Android Debug Bridge (adb) for device interaction and provides a range of features to enhance efficiency and effectiveness in Android security research.
 
 ## Features
 
-- **Device Management**: View all connected Android devices and emulators along with their detailed information on a single web page.
-- **Remote Access**: Access the adb shell of selected devices directly from the web interface.
-- **Screen Viewing**: Utilize tools like "scrcpy" or establish a VNC connection to view the screen of connected devices.
-- **Access Control**: Manage user access to devices through login authentication to prevent multiple users from using the same device simultaneously.
-- **File System Exploration**: Explore the entire file system of rooted physical phones and emulators.
-- **App Management**: View a list of all installed apps on the selected device for analysis and inspection.
-- **Network Traffic Inspection**: Monitor HTTP/S traffic, tracing, and logging network data to and from the device for security analysis.
+* **Device Management:** Gain a comprehensive overview of all connected Android devices and emulators with detailed information displayed on a single web page.
+* **Remote Access:** Interact directly with the adb shell of selected devices from the web interface itself.
+* **Screen Viewing:** Integrate tools like "scrcpy" or establish a VNC connection to remotely view the screen of connected devices.
+* **Access Control:** Implement user login functionalities to manage access to devices and prevent simultaneous usage by multiple users.
+* **File System Exploration:** Explore the entire file system of rooted physical devices and emulators for deeper analysis.
+* **App Management:** View a list of all installed applications on the selected device for in-depth examination.
+* **Network Traffic Inspection:** Monitor, trace, and log HTTP/S traffic, aiding in security assessments by analyzing network data to and from the device.
 
-## Installation
+## Installation (**Note:** Placeholder instructions)
 
-1. Clone the repository:
+1. Clone the repository using the following command:
 
    ```bash
-   git clone https://github.com/your_username/android-device-manager.git
+   git clone https://github.com/gohilmukund123/android-device-manager.git
    ```
 
 2. Navigate to the project directory:
@@ -26,7 +26,7 @@ Android Device Manager is a web application designed to simplify the management 
    cd android-device-manager
    ```
 
-3. Install dependencies:
+3. Install required dependencies:
 
    ```bash
    npm install
@@ -38,18 +38,18 @@ Android Device Manager is a web application designed to simplify the management 
    npm start
    ```
 
-5. Access the application at `http://localhost:3000` in your web browser.
+5. Access the application in your web browser at `http://localhost:3000`.
 
-## Tech Stack
+## Tech Stack (**Placeholder:** Replace with specific technologies used)
 
-- **Python**: Backend scripting for adb functionality.
-- **HTML/CSS**: Frontend design and layout.
-- **React**: JavaScript library for building user interfaces.
-- **JavaScript**: Client-side scripting for dynamic interactions.
+* **Backend:** Python (for adb functionality)
+* **Frontend:** HTML/CSS (for design and layout)
+* **Frontend Framework:** React (for building user interfaces)
+* **Client-side Scripting:** JavaScript (for dynamic interactions)
 
 ## Testing
 
-To ensure the effectiveness of Android Device Manager, thorough testing will be conducted, focusing on:
+To guarantee the effectiveness of Android Device Manager, comprehensive testing will be conducted with a focus on:
 
-- Handling multiple Android devices and emulators connected to the server simultaneously.
-- Verification of all specified features to ensure they function as intended.
+* **Multi-Device Handling:** Verify smooth operation with multiple Android devices and emulators connected to the server simultaneously.
+* **Feature Functionality:** Ensure all implemented features function as intended. 
