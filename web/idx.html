@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebADB</title>
+    <style>
+      /* Body styles */
+      body {
+        background-color: #e0f2f1;
+        background-image: url("D:\sahil\d2\Hackathon24-main\Hackathon24-main\kali.png"); /* Replace with your image path */
+        background-size: cover;
+        background-repeat: no-repeat;
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 20px; /* Add some padding for better layout */
+      }
+
+      /* Container for card (optional) */
+      .container {
+        max-width: 800px;
+        margin: 0 auto; /* Center the card horizontally */
+      }
+
+      /* Card styles */
+      .card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 50px;
+        transition: transform 0.3s ease-in-out;
+        padding: 30px;
+        width: 60%;
+      }
+      h1 {
+        text-align: center;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Card layout (flexbox) */
+      .card-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center; /* Vertically align information */
+        justify-content: space-between; /* Horizontally space buttons */
+        padding: 15px; /* Adjust padding for content spacing */
+      }
+
+      /* Information section */
+      .card-info {
+        flex: 2; /* Allocate more space for information */
+      }
+
+      .card-header h2 {
+        margin: 0;
+        font-size: 1.2em;
+        font-family: "Roboto", sans-serif;
+      }
+
+      .card-body {
+        padding: 10px 0; /* Adjust padding for content */
+      }
+
+      /* Button group (flexbox) */
+      .button-group {
+        display: flex;
+        flex: 1; /* Allocate space for buttons */
+        justify-content: space-around; /* Evenly distribute buttons */
+      }
+
+      /* Buttons */
+      button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+        background-color: #5ec5ce; /* Green color */
+        color: white;
+        font-weight: bold; /* Add some emphasis */
+        margin: 5px; /* Add some spacing between buttons */
+      }
+
+      button:hover {
+        transform: scale(1.02);
+        opacity: 0.8;
+      }
+
+      /* Optional button styles (for customization) */
+      .primary-button {
+        background-color: #007bff; /* Blue */
+      }
+
+      .secondary-button {
+        background-color: #777; /* Gray */
+      }
+
+      .success-button {
+        background-color: #28a745; /* Green */
+      }
+
+      .info-button {
+        background-color: #17a2b8; /* Light blue */
+      }
+
+      .delete-button {
+        background-color: red;
+        color: white;
+      }
+
+      /* Media Queries for responsiveness (adjust as needed) */
+      @media only screen and (max-width: 768px) {
+        .container {
+          max-width: 90%;
+        }
+
+        .card-content {
+          flex-direction: column; /* Stack information on top of buttons on small screens */
+          align-items: flex-start; /* Align information to the left */
+        }
+
+        .card-info,
+        .button-group {
+          flex: 1; /* Give equal space to information and buttons on small screens */
+        }
+
+        .card-header h2 {
+          font-size: 1em;
+        }
+        button {
+          font-size: 0.9em;
+        }
+      }
+      .wireless {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+      }
+      .flex{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Android Device Management</h1>
+    <div id="root" dir="auto"></div>
+
+    <script type="text/babel">
+      class ErrorBoundary extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = { hasError: false };
+        }
+
+        componentDidCatch(error, errorInfo) {
+          console.log(error, errorInfo);
+          this.setState({ hasError: true });
+        }
+
+        render() {
+          if (this.state.hasError) {
+            return <h1>Something went wrong.</h1>;
+          }
+
+          return this.props.children;
+        }
+      }
+
+      class App extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            baseUrl: "http://localhost:8888",
+            devices: [],
+            expandedDevice: null,
+            commandDevice: null,
+            commandDevice1: null, // Initialize commandDevice1
+            netAttriData: null, // Initialize netAttriData
+          };
+        }
+
+        componentDidMount() {
+          const { baseUrl } = this.state;
+          fetch(`${baseUrl}/devices`)
+            .then((response) => response.json())
+            .then((devices) => {
+              this.setState({ devices });
+              devices.forEach((device) => {
+                fetch(`${baseUrl}/shell`, {
+                  method: "POST",
+                  body: JSON.stringify({
+                    device: device.id,
+                    command: 'pm list packages -f | sed -e "s/.*=//" | sort',
+                  }),
+                })
+                  .then((res) => res.text())
+                  .then((packages) => {
+                    device.packages = packages.split("\n");
+                    this.forceUpdate();
+                  })
+                  .catch((e) => console.log(e));
+              });
+            })
+            .catch((error) => console.error("Error fetching devices:", error));
+        }
+
+        toggleExpanded = (device) => {
+          this.setState((prevState) => ({
+            expandedDevice: prevState.expandedDevice === device ? null : device,
+          }));
+        };
+
+        componentWillMount() {
+          const { baseUrl } = this.state;
+          fetch(`${baseUrl}/devices`)
+            .then((response) => response.json())
+            .then((device) => {
+              this.setState({
+                device,
+                connection: `${device[0].manufacturer.toUpperCase()} ${
+                  device[0].model
+                }`,
+              });
+
+              fetch(`${baseUrl}/shell`, {
+                method: "POST",
+                body: JSON.stringify({
+                  device: device[0].id,
+                  command: 'pm list packages -f | sed -e "s/.*=//" | sort',
+                }),
+              })
+                .then((res) => res.text())
+                .then((packages) => {
+                  if (!this.state.packages)
+                    this.setState({ packages: packages.split("\n") });
+                })
+                .catch((e) => console.log(e));
+            })
+            .catch((e) => console.log(e));
+        }
+
+        runScrcpy(device) {
+          const { baseUrl } = this.state;
+          fetch(`${baseUrl}/scrcpy`, {
+            // <-- Added backticks for string interpolation
+            method: "POST",
+            body: JSON.stringify({ device: device.id }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              console.log("Scrcpy started successfully.");
+              // Handle success, if needed
+            })
+            .catch((error) => {
+              console.error("Error running Scrcpy:", error);
+              // Handle error, if needed
+            });
+        }
+
+        deleteApp(device, item) {
+          const { baseUrl } = this.state;
+          fetch(`${baseUrl}/shell`, {
+            method: "POST",
+            body: JSON.stringify({
+              device: device.id,
+              command: `pm uninstall ${item}`,
+            }),
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return res.text();
+            })
+            .then((data) => {
+              console.log(`App deletion message for ${item}: ${data}`);
+              const updatedPackages = device.packages.filter(
+                (pkg) => pkg !== item
+              );
+              device.packages = updatedPackages;
+              this.forceUpdate();
+            })
+            .catch((e) => console.log(e));
+        }
+
+        net_analysis(device) {
+          const { baseUrl } = this.state;
+          fetch(`${baseUrl}/netan`, {
+            method: "POST",
+            body: JSON.stringify({ device: device.id }),
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return res.text();
+            })
+            .then((data) => {
+              console.log(data);
+              this.setState({ commandDevice: device });
+              device.output = data;
+              this.forceUpdate();
+            })
+            .catch((e) => console.log(e));
+        }
+
+        pairDevice() {
+          const { baseUrl } = this.state;
+          let ipPort = prompt(
+            "Enter IP:Port to pair (e.g., 192.168.0.98:41301)",
+            "192.168.0.98:41301"
+          );
+          let verificationCode = prompt("Enter verification code", "958107");
+
+          if (!ipPort || !verificationCode) {
+            console.log(
+              "Invalid input. IP:Port and verification code are required."
+            );
+            return;
+          }
+
+          fetch(`${baseUrl}/pair`, {
+            method: "POST",
+            body: JSON.stringify({
+              ipPort: ipPort,
+              verificationCode: verificationCode,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              console.log("Pairing process initiated successfully.");
+              // Handle success, if needed
+            })
+            .catch((error) => {
+              console.error("Error initiating pairing process:", error);
+              // Handle error, if needed
+            });
+        }
+
+        connectDevice() {
+          const { baseUrl } = this.state;
+          let ipPort = prompt(
+            "Enter IP:Port to pair (e.g., 192.168.0.98:41301)",
+            "192.168.0.98:41301"
+          );
+
+          if (!ipPort) {
+            console.log(
+              "Invalid input. IP:Port and verification code are required."
+            );
+            return;
+          }
+          fetch(`${baseUrl}/connect`, {
+            method: "POST",
+            body: JSON.stringify({ ipPort: ipPort }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              console.log("connection process initiated successfully.");
+              // Handle success, if needed
+            })
+            .catch((error) => {
+              console.error("Error initiating pairing process:", error);
+              // Handle error, if needed
+            });
+        }
+
+        deletepkg(deviceId, pkgName) {
+          const { baseUrl } = this.state;
+          fetch(`${baseUrl}/deletepkg`, {
+            method: "POST",
+            body: JSON.stringify({ device: deviceId, pkg: pkgName }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              console.log(`Package ${pkgName} deleted successfully.`);
+              // Handle success, if needed
+            })
+            .catch((error) => {
+              console.error("Error deleting package:", error);
+              // Handle error, if needed
+            });
+        }
+
+        openCmd(device) {
+          const { baseUrl } = this.state;
+          fetch(`${baseUrl}/open_cmd`, {
+            method: "POST",
+            body: JSON.stringify({ device: device.id }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              console.log("Scrcpy started successfully.");
+              // Handle success, if needed
+            })
+            .catch((error) => {
+              console.error("Error running Scrcpy:", error);
+              // Handle error, if needed
+            });
+        }
+
+        removeDevice(device) {
+          const { baseUrl, devices } = this.state;
+          const updatedDevices = devices.filter((d) => d.id !== device.id);
+
+          fetch(`${baseUrl}/remove_device`, {
+            method: "POST",
+            body: JSON.stringify({ device: device.id }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              console.log(`Device ${device.id} removed successfully.`);
+              this.setState({ devices: updatedDevices });
+              // Handle success, if needed
+            })
+            .catch((error) => {
+              console.error("Error removing device:", error);
+              // Handle error, if needed
+            });
+        }
+
+        executeCommand(device) {
+          const { baseUrl } = this.state;
+          let command = prompt("Enter command to execute", "pm");
+          fetch(`${baseUrl}/shell`, {
+            method: "POST",
+            body: JSON.stringify({ device: device.id, command: command }),
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return res.text();
+            })
+            .then((data) => {
+              console.log(data);
+              this.setState({ commandDevice: device });
+              device.output = data;
+              this.forceUpdate();
+            })
+            .catch((e) => console.log(e));
+        }
+
+        onandoff(device) {
+          const { baseUrl } = this.state;
+          let command = "reboot -p";
+          fetch(`${baseUrl}/onOff`, {
+            method: "POST",
+            body: JSON.stringify({ device: device.id, command: command }),
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return res.text();
+            })
+            .then((data) => {
+              console.log(data);
+              this.setState({ commandDevice: device });
+              device.output = data;
+              this.forceUpdate();
+            })
+            .catch((e) => console.log(e));
+        }
+
+        netattri(device) {
+          const { baseUrl } = this.state;
+          let command = `ifconfig | awk '/^[a-z]/ { iface = $1; } /inet / { ip_address = $2; } /RX bytes/ { rx_bytes = $2; tx_bytes = $6; print "Interface: " iface ", IP Address: " ip_address ", RX bytes: " rx_bytes ", TX bytes: " tx_bytes; }'`;
+
+          fetch(`${baseUrl}/shell`, {
+            method: "POST",
+            body: JSON.stringify({ device: device.id, command: command }),
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return res.text();
+            })
+            .then((data) => {
+              console.log(data);
+              this.setState({ commandDevice: device });
+              device.output = data;
+              this.forceUpdate();
+              // Update state with netAttriData instead of directly modifying device output
+              // this.setState({ commandDevice: device, netAttriData: data });
+            })
+            .catch((e) => console.log(e));
+        }
+
+        render() {
+          const {
+            devices,
+            expandedDevice,
+            commandDevice,
+            commandDevice1,
+            netAttriData,
+          } = this.state;
+          console.log(devices, "devices");
+          return (
+            <div className="wireless">
+              <div class="flex">
+                <p>For Wireless Connection : </p>
+                <button onClick={() => this.pairDevice()}>Pair Device</button>
+                <button onClick={() => this.connectDevice()}>
+                  Connect Device
+                </button>
+              </div>
+              <h1>Connected Devices</h1>
+              {devices.map((device, index) => (
+                <div key={index} className="card">
+                  <div className="card-header">
+                    <h2>{`${device.manufacturer.toUpperCase()} ${
+                      device.model
+                    }`}</h2>
+                    <p>
+                      Battery: {device.battery?.level}% (
+                      {device.battery?.status}), ({device.battery?.plugged}){" "}
+                    </p>
+                    <p>Key: {device.id}</p>
+                    <p>
+                      Network:{device.network?.connected} (
+                      {device.network?.ssid})
+                    </p>
+                    <button onClick={() => this.toggleExpanded(device)}>
+                      See Packages
+                    </button>
+                    <button onClick={() => this.executeCommand(device)}>
+                      Execute Command
+                    </button>
+                    <button onClick={() => this.runScrcpy(device)}>
+                      Run Scrcpy
+                    </button>
+                    <button onClick={() => this.openCmd(device)}>
+                      Open Shell
+                    </button>
+                    <button onClick={() => this.netattri(device)}>
+                      Network Analysis
+                    </button>
+                    <button onClick={() => this.removeDevice(device)}>
+                      Remove Devices
+                    </button>
+                    <button onClick={() => this.onandoff(device)}>
+                      Reboot Device
+                    </button>
+                  </div>
+                  {expandedDevice === device && (
+                    <div className="card-body">
+                      <h3>List of Packages:</h3>
+                      <ul>
+                        {device.packages.map((pkg, index) => (
+                          <li key={index}>
+                            <span>{pkg}</span>
+                            <button
+                              onClick={() => this.deletepkg(device.id, pkg)}
+                              className="delete-button"
+                            >
+                              delete
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div>
+                    {commandDevice === device && (
+                      <div className="card-body">
+                        <h3>Output:</h3>
+                        <pre>{device.output}</pre>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>,
+        document.getElementById("root")
+      );
+    </script>
+
+    <script
+      crossorigin
+      src="https://unpkg.com/react@16.13.1/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js"
+    ></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/dataformsjs@4.0.1/js/react/jsxLoader.min.js"></script>
+  </body>
+</html>
