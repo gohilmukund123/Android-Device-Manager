@@ -52,4 +52,23 @@ This project offers a web application, Android Device Manager, designed to simpl
 To guarantee the effectiveness of Android Device Manager, comprehensive testing will be conducted with a focus on:
 
 * **Multi-Device Handling:** Verify smooth operation with multiple Android devices and emulators connected to the server simultaneously.
-* **Feature Functionality:** Ensure all implemented features function as intended. 
+* **Feature Functionality:** Ensure all implemented features function as intended.
+
+## Screenshots
+**List of Connected Devices:**
+![a1](https://github.com/gohilmukund123/Android-Device-Manager/assets/114324098/d7544253-5604-4335-95bf-eac57769d2ed)
+
+**ADB Shell Access:**
+![a2](https://github.com/gohilmukund123/Android-Device-Manager/assets/114324098/b5771cd7-7e4b-4c28-a154-bfe0cc1454be)
+
+**Screen Mirroring using SCRCPY:**
+![a3](https://github.com/gohilmukund123/Android-Device-Manager/assets/114324098/58d9d062-e1c2-4145-963c-894bed25e5b0)
+
+**Package inspection:**
+![a4](https://github.com/gohilmukund123/Android-Device-Manager/assets/114324098/dce47338-2fd6-4db1-8ed1-9522cd666642)
+
+**ADB Shell Command Execution(Single Line Commands):**
+![a5](https://github.com/gohilmukund123/Android-Device-Manager/assets/114324098/50d49c83-46be-4a4b-a701-6e9ec350b61a)
+
+**Reboot Mobile Device using ABD Shell Commands:**
+![a6](https://github.com/gohilmukund123/Android-Device-Manager/assets/114324098/46e8fe06-26f8-4fbe-a875-9557d67d093e)
