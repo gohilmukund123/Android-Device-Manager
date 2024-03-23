@@ -38,7 +38,7 @@ This project offers a web application, Android Device Manager, designed to simpl
    npm start
    ```
 
-5. Access the application in your web browser at `http://localhost:3000`.
+5. Access the application in your web browser at `http://localhost:8888`.
 
 ## Tech Stack (**Placeholder:** Replace with specific technologies used)
 
