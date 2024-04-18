@@ -40,7 +40,7 @@ This project offers a web application, Android Device Manager, designed to simpl
 
 5. Access the application in your web browser at `http://localhost:8888`.
 
-## Tech Stack (**Placeholder:** Replace with specific technologies used)
+## Tech Stack
 
 * **Backend:** Python (for adb functionality)
 * **Frontend:** HTML/CSS (for design and layout)
